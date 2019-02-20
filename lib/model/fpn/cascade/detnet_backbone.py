@@ -303,7 +303,12 @@ class detnet(_FPN):
         if self.pretrained == True:
             print("Loading pretrained weights from %s" % (self.model_path))
             state_dict = torch.load(self.model_path, map_location=lambda storage, loc: storage)
-            detnet.load_state_dict({k: v for k, v in state_dict.items() if k in detnet.state_dict()})
+            #detnet.load_state_dict({k: v for k, v in state_dict.items() if k in detnet.state_dict()})
+            #加载部分预训练模型
+            state_dict_1 = detnet.state_dict()
+            pretrained_dict = {k: v for k, v in state_dict.items() if k in state_dict_1}
+            state_dict_1.update(pretrained_dict)
+            detnet.load_state_dict(state_dict_1)
 
         self.RCNN_layer0 = nn.Sequential(detnet.conv1, detnet.bn1, detnet.relu, detnet.maxpool)
         self.RCNN_layer1 = nn.Sequential(detnet.layer1)
