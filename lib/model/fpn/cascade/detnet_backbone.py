@@ -306,7 +306,22 @@ class detnet(_FPN):
             #detnet.load_state_dict({k: v for k, v in state_dict.items() if k in detnet.state_dict()})
             #加载部分预训练模型
             state_dict_1 = detnet.state_dict()
-            pretrained_dict = {k: v for k, v in state_dict.items() if k in state_dict_1}
+            #将coco的预训练模型参数对应读入detnet59模型中
+            #pretrained_dict = {k: v for k, v in state_dict['model'].items() if k in state_dict_1}
+            new_state_dict = {}
+            for k,v in state_dict['model'].items():
+                #字符串中含有'.'为3个的进行处理,得到新的参数字典
+                if len(k.split('.'))-1 == 3:
+                    k_new = k.split('_')[1]
+                    k_new_1 = k_new[:7]+k_new[9:]
+                    new_state_dict[k_new_1] = v
+                 elif k[:11]=='RCNN_layer0':
+                    k_new = k.split('_')[1]
+                    k_new_1 = k_new[:5]+k_new[7:]
+                    new_state_dict[k_new_1] = v          
+                 elif:
+                    new_state_dict[k] = v
+            pretrained_dict = {k: v for k, v in new_state_dict.items() if k in state_dict_1}
             state_dict_1.update(pretrained_dict)
             detnet.load_state_dict(state_dict_1)
 
